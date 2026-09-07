@@ -6,6 +6,7 @@ pipeline {
     environment {
         AWS_ACCESS_KEY_ID     = credentials('AWS_ACCESS_KEY_ID')
         AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
+        TERRAFORM_EXE         = 'D:\\User Data\\terraform\\terraform_1.3.9_windows_amd64\\terraform.exe'
     }
 
     agent any
@@ -22,10 +23,9 @@ pipeline {
 
         stage('Plan') {
             steps {
-                // 'cd' and 'terraform' are chained using '&&' in Windows Batch
-                bat 'cd terraform && terraform init'
-                bat "cd terraform && terraform plan -out tfplan"
-                bat 'cd terraform && terraform show -no-color tfplan > tfplan.txt'
+                bat 'cd terraform && "%TERRAFORM_EXE%" init'
+                bat 'cd terraform && "%TERRAFORM_EXE%" plan -out tfplan'
+                bat 'cd terraform && "%TERRAFORM_EXE%" show -no-color tfplan > tfplan.txt'
             }
         }
         
@@ -49,7 +49,7 @@ pipeline {
 
         stage('Apply') {
             steps {
-                bat "cd terraform && terraform apply -input=false tfplan"
+                bat 'cd terraform && "%TERRAFORM_EXE%" apply -input=false tfplan'
             }
         }
     }
